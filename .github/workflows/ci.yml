@@ -59,7 +59,8 @@ jobs:
         run: |
           echo "JWT_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
           echo "APP_AES_KEY=$(openssl rand -hex 8)" >> "$GITHUB_ENV"
-          echo "APP_ADMIN_PASSWORD=Ci#$(openssl rand -hex 8)A" >> "$GITHUB_ENV"
+          aleatorio=$(openssl rand -hex 16)
+          echo "APP_ADMIN_PASSWORD=$aleatorio" >> "$GITHUB_ENV"
 
       - uses: actions/setup-java@v4
         if: steps.existe.outputs.si == 'true'
