@@ -1,0 +1,110 @@
+# Pruebas automáticas del back y del front.
+# Corren en cada pull request y en cada push a main, ramaBack y ramaFront.
+# Si una prueba falla, GitHub no deja hacer merge (cuando la rama está protegida).
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main, ramaBack, ramaFront]
+  push:
+    branches: [main, ramaBack, ramaFront]
+
+jobs:
+  back:
+    name: Back - pruebas
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back/proyectofinal
+
+    # Base de datos temporal solo para las pruebas: no se toca la base compartida.
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: detectoria_ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    # Valores de prueba. Spring los toma en lugar de los del application.properties.
+    # Las IAs y el correo están simulados en las pruebas, así que no hacen falta claves reales.
+    env:
+      SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/detectoria_ci
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      JWT_SECRET: clave-solo-para-pruebas-de-github-actions-1234567890
+      APP_AES_KEY: PruebasCI1234567
+      APP_AES_IV: VectorCI12345678
+      APP_ADMIN_USERNAME: adminci
+      APP_ADMIN_EMAIL: adminci@ejemplo.com
+      APP_ADMIN_PASSWORD: AdminCI#2026
+      APP_GEO_ENABLED: "false"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # En ramaFront todavía no está el back: en ese caso el trabajo no hace nada.
+      - name: Revisar si existe el back
+        id: existe
+        working-directory: .
+        run: |
+          if [ -f back/proyectofinal/pom.xml ]; then echo "si=true" >> "$GITHUB_OUTPUT"; else echo "si=false" >> "$GITHUB_OUTPUT"; fi
+
+      - uses: actions/setup-java@v4
+        if: steps.existe.outputs.si == 'true'
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          cache-dependency-path: back/proyectofinal/pom.xml
+
+      - name: Crear application.properties a partir del ejemplo
+        if: steps.existe.outputs.si == 'true'
+        run: cp src/main/resources/application.properties.example src/main/resources/application.properties
+
+      - name: Correr pruebas
+        if: steps.existe.outputs.si == 'true'
+        run: mvn -B test
+
+  front:
+    name: Front - pruebas
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # En ramaBack todavía no está el front: en ese caso el trabajo no hace nada.
+      - name: Revisar si existe el front
+        id: existe
+        working-directory: .
+        run: |
+          if [ -f front/angular.json ]; then echo "si=true" >> "$GITHUB_OUTPUT"; else echo "si=false" >> "$GITHUB_OUTPUT"; fi
+
+      - uses: actions/setup-node@v4
+        if: steps.existe.outputs.si == 'true'
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+
+      - name: Instalar dependencias
+        if: steps.existe.outputs.si == 'true'
+        run: npm ci
+
+      - name: Correr pruebas
+        if: steps.existe.outputs.si == 'true'
+        run: npx ng test --watch=false
+
+      - name: Compilar
+        if: steps.existe.outputs.si == 'true'
+        run: npx ng build
