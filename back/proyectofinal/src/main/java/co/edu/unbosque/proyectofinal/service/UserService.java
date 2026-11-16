@@ -10,7 +10,7 @@ import co.edu.unbosque.proyectofinal.model.EmailToken.TokenType;
 import co.edu.unbosque.proyectofinal.model.User;
 import co.edu.unbosque.proyectofinal.repository.EmailTokenRepository;
 import co.edu.unbosque.proyectofinal.repository.UserRepository;
-import co.edu.unbosque.proyectofinal.util.AESUtil;
+import co.edu.unbosque.proyectofinal.util.CifradoUtil;
 import co.edu.unbosque.proyectofinal.util.EmailSender;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -55,9 +55,9 @@ public class UserService implements CRUDOperation<UserDTO> {
   private static final String HASH_FALSO = new BCryptPasswordEncoder().encode("usuario-inexistente");
 
   /**
-   * Forma de un texto cifrado por {@link AESUtil}: Base64 de al menos 24 caracteres (el cifrado
-   * GCM agrega 16 bytes de etiqueta). Un teléfono en texto plano (máximo 20 caracteres) nunca
-   * cumple este formato.
+   * Forma de los teléfonos cifrados con la versión anterior, que usaba un IV fijo: Base64 de al
+   * menos 24 caracteres. Esos valores ya no se pueden descifrar y se muestran vacíos. Un teléfono
+   * en texto plano (máximo 20 caracteres) nunca cumple este formato.
    */
   private static final Pattern CIFRADO =
       Pattern.compile("^(?:[A-Za-z0-9+/]{4}){6,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$");
@@ -94,10 +94,6 @@ public class UserService implements CRUDOperation<UserDTO> {
   /** Llave AES de 16 caracteres para cifrar el teléfono. */
   @Value("${app.aes.key}")
   private String llaveAes;
-
-  /** Vector de inicialización AES de 16 caracteres. */
-  @Value("${app.aes.iv}")
-  private String ivAes;
 
   /** Constructor vacío. */
   public UserService() {}
@@ -551,28 +547,31 @@ public class UserService implements CRUDOperation<UserDTO> {
   }
 
   /**
-   * Cifra el teléfono con AES antes de guardarlo.
+   * Cifra el teléfono con AES y un IV nuevo antes de guardarlo.
    *
    * @param telefono teléfono en texto plano
-   * @return teléfono cifrado en Base64
+   * @return teléfono cifrado con la forma {@code iv:textoCifrado}
    */
   private String cifrar(String telefono) {
-    return AESUtil.encrypt(llaveAes, ivAes, telefono);
+    return CifradoUtil.cifrar(llaveAes, telefono);
   }
 
   /**
    * Descifra el teléfono guardado. Los usuarios creados antes del cifrado tienen el teléfono en
-   * texto plano y se devuelve tal cual.
+   * texto plano y se devuelve tal cual; los cifrados con la versión anterior (IV fijo) se
+   * devuelven vacíos.
    *
    * @param guardado teléfono como está en la base de datos
-   * @return teléfono en texto plano, o null si no tiene
+   * @return teléfono en texto plano, o null si no tiene o no se puede leer
    */
   private String descifrar(String guardado) {
-    if (guardado == null || !CIFRADO.matcher(guardado).matches()) {
-      return guardado;
+    if (CifradoUtil.tieneFormato(guardado)) {
+      return CifradoUtil.descifrar(llaveAes, guardado);
     }
-    String telefono = AESUtil.decrypt(llaveAes, ivAes, guardado);
-    return telefono.isEmpty() ? guardado : telefono;
+    if (guardado == null || CIFRADO.matcher(guardado).matches()) {
+      return null;
+    }
+    return guardado;
   }
 
   /**

@@ -70,29 +70,33 @@ All models are configured in `application.properties`, so a retired model can be
 Everything is configured in `src/main/resources/application.properties`. That file holds real keys, so it is not in the repository. Copy `application.properties.example` (same folder) to `application.properties` and fill in these values:
 
 ```properties
+# Database
 spring.datasource.url=jdbc:mysql://HOST:3306/DATABASE
-spring.datasource.username=DB_USER
-spring.datasource.password=DB_PASSWORD
+spring.datasource.username=
+spring.datasource.password=
 spring.jpa.hibernate.ddl-auto=update
 
-jwt.secret=A_LONG_RANDOM_SECRET
-app.aes.key=16_CHARACTER_KEY
-app.aes.iv=16_CHARACTER_IV_
+# Security: JWT secret (long and random) and a 16 character AES key
+jwt.secret=
+app.aes.key=
 
-spring.mail.username=your.account@gmail.com
-spring.mail.password=GMAIL_APP_PASSWORD
+# Email (a Gmail account with an app password)
+spring.mail.username=
+spring.mail.password=
 app.frontend-url=http://localhost:4200
 
-app.admin.username=ADMIN_USERNAME
-app.admin.email=ADMIN_EMAIL
-app.admin.password=ADMIN_PASSWORD
+# Admin account created on startup
+app.admin.username=
+app.admin.email=
+app.admin.password=
 
-ai.gemini.api-key=...
-ai.groq.api-key=...
-ai.openrouter.api-key=...
-ai.nvidia.api-key=...
-ai.cohere.api-key=...
-ai.github-models.api-key=...
+# AI provider keys
+ai.gemini.api-key=
+ai.groq.api-key=
+ai.openrouter.api-key=
+ai.nvidia.api-key=
+ai.cohere.api-key=
+ai.github-models.api-key=
 ```
 
 The rest of the file (models, limits, timeouts, Swagger options) already has working values.
@@ -195,7 +199,7 @@ src/main/java/co/edu/unbosque/proyectofinal
 
 ## Notes
 
-- Passwords are hashed with BCrypt. Phone numbers and the IP address stored in the audit log are encrypted with AES-GCM (`AESUtil`) using the key and IV from `application.properties`, and decrypted only when they are sent to the front end. Phone numbers saved before encryption was added are still readable. The encrypted IP lives in a new `ip_cifrada` column that Hibernate adds on startup, so audit entries created before that change show no IP.
+- Passwords are hashed with BCrypt. Phone numbers and the IP address stored in the audit log are encrypted with AES-GCM (`AESUtil`) using the key from `application.properties` and a new random IV for every value (`CifradoUtil`), and decrypted only when they are sent to the front end. Phone numbers saved before encryption was added are still readable. Values encrypted by an earlier version, which used a fixed IV, can no longer be read and show up empty. The encrypted IP lives in the `ip_cifrada` column, which Hibernate adds on startup.
 - All calls to external APIs go through `ExternalHTTPRequestHandler`, which converts each JSON response into its own DTO with Gson. Data from those APIs that is not stored has a DTO only, with no entity or repository.
 - The Javadoc is in the `docs` folder (open `docs/index.html`).
 - The percentages are estimates made by AI models. They are not proof of authorship and should be read together with other criteria.

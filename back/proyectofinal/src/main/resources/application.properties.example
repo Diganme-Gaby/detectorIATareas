@@ -103,7 +103,6 @@ ai.github-models.min-interval-ms=4500
 
 
 app.aes.key=CAMBIAR_16_CHARS
-app.aes.iv=CAMBIAR_16_CHARS
 
 # Geolocalizacion para la auditoria
 app.geo.enabled=true

@@ -70,29 +70,33 @@ Todos los modelos se configuran en `application.properties`, así que si retiran
 Todo se configura en `src/main/resources/application.properties`. Ese archivo tiene claves reales, así que no está en el repositorio. Copia `application.properties.example` (en la misma carpeta) como `application.properties` y llena estos valores:
 
 ```properties
+# Base de datos
 spring.datasource.url=jdbc:mysql://HOST:3306/BASE_DE_DATOS
-spring.datasource.username=USUARIO_BD
-spring.datasource.password=CLAVE_BD
+spring.datasource.username=
+spring.datasource.password=
 spring.jpa.hibernate.ddl-auto=update
 
-jwt.secret=UN_SECRETO_LARGO_Y_ALEATORIO
-app.aes.key=LLAVE16CARACTER_
-app.aes.iv=VECTOR16CARACTER
+# Seguridad: secreto del JWT (largo y aleatorio) y llave AES de 16 caracteres
+jwt.secret=
+app.aes.key=
 
-spring.mail.username=tu.cuenta@gmail.com
-spring.mail.password=CLAVE_DE_APLICACION_GMAIL
+# Correo (una cuenta de Gmail con contraseña de aplicación)
+spring.mail.username=
+spring.mail.password=
 app.frontend-url=http://localhost:4200
 
-app.admin.username=USUARIO_ADMIN
-app.admin.email=CORREO_ADMIN
-app.admin.password=CLAVE_ADMIN
+# Cuenta de administrador que se crea al arrancar
+app.admin.username=
+app.admin.email=
+app.admin.password=
 
-ai.gemini.api-key=...
-ai.groq.api-key=...
-ai.openrouter.api-key=...
-ai.nvidia.api-key=...
-ai.cohere.api-key=...
-ai.github-models.api-key=...
+# API keys de las IAs
+ai.gemini.api-key=
+ai.groq.api-key=
+ai.openrouter.api-key=
+ai.nvidia.api-key=
+ai.cohere.api-key=
+ai.github-models.api-key=
 ```
 
 El resto del archivo (modelos, límites, tiempos de espera, opciones de Swagger) ya trae valores que funcionan.
@@ -195,7 +199,7 @@ src/main/java/co/edu/unbosque/proyectofinal
 
 ## Notas
 
-- Las contraseñas se guardan con hash BCrypt. Los teléfonos y la IP de la auditoría se cifran con AES-GCM (`AESUtil`) usando la llave y el IV del `application.properties`, y solo se descifran al enviarlos al frontend. Los teléfonos guardados antes del cifrado se siguen leyendo bien. La IP cifrada va en una columna nueva, `ip_cifrada`, que Hibernate agrega al arrancar; por eso los registros de auditoría anteriores a ese cambio no muestran IP.
+- Las contraseñas se guardan con hash BCrypt. Los teléfonos y la IP de la auditoría se cifran con AES-GCM (`AESUtil`) usando la llave del `application.properties` y un IV aleatorio nuevo para cada valor (`CifradoUtil`), y solo se descifran al enviarlos al frontend. Los teléfonos guardados antes del cifrado se siguen leyendo bien. Los valores cifrados con una versión anterior, que usaba un IV fijo, ya no se pueden leer y aparecen vacíos. La IP cifrada va en la columna `ip_cifrada`, que Hibernate agrega al arrancar.
 - Todas las llamadas a APIs externas pasan por `ExternalHTTPRequestHandler`, que convierte cada respuesta JSON en su propio DTO con Gson. Los datos de esas APIs que no se guardan solo tienen DTO, sin entidad ni repositorio.
 - El Javadoc está en la carpeta `docs` (abre `docs/index.html`).
 - Los porcentajes son estimaciones hechas por modelos de IA. No son prueba de autoría y deben leerse junto con otros criterios.

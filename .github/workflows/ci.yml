@@ -41,7 +41,6 @@ jobs:
       SPRING_DATASOURCE_PASSWORD: root
       JWT_SECRET: clave-solo-para-pruebas-de-github-actions-1234567890
       APP_AES_KEY: PruebasCI1234567
-      APP_AES_IV: VectorCI12345678
       APP_ADMIN_USERNAME: adminci
       APP_ADMIN_EMAIL: adminci@ejemplo.com
       APP_ADMIN_PASSWORD: AdminCI#2026
