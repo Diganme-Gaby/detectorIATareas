@@ -35,15 +35,13 @@ jobs:
 
     # Valores de prueba. Spring los toma en lugar de los del application.properties.
     # Las IAs y el correo están simulados en las pruebas, así que no hacen falta claves reales.
+    # El secreto del JWT, la llave AES y la clave del admin se generan al azar en cada ejecución.
     env:
       SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/detectoria_ci
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      JWT_SECRET: clave-solo-para-pruebas-de-github-actions-1234567890
-      APP_AES_KEY: PruebasCI1234567
       APP_ADMIN_USERNAME: adminci
       APP_ADMIN_EMAIL: adminci@ejemplo.com
-      APP_ADMIN_PASSWORD: AdminCI#2026
       APP_GEO_ENABLED: "false"
 
     steps:
@@ -55,6 +53,13 @@ jobs:
         working-directory: .
         run: |
           if [ -f back/proyectofinal/pom.xml ]; then echo "si=true" >> "$GITHUB_OUTPUT"; else echo "si=false" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Generar claves de prueba
+        if: steps.existe.outputs.si == 'true'
+        run: |
+          echo "JWT_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+          echo "APP_AES_KEY=$(openssl rand -hex 8)" >> "$GITHUB_ENV"
+          echo "APP_ADMIN_PASSWORD=Ci#$(openssl rand -hex 8)A" >> "$GITHUB_ENV"
 
       - uses: actions/setup-java@v4
         if: steps.existe.outputs.si == 'true'
