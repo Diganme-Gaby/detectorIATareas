@@ -1,0 +1,33 @@
+.ver-clave {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-ceniza);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.ver-clave:hover,
+.ver-clave:focus-visible {
+  color: var(--color-iris-suave);
+}
+
+.ver-clave:focus-visible {
+  outline: 1px solid var(--color-iris);
+  outline-offset: 2px;
+}
+
+.ver-clave svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

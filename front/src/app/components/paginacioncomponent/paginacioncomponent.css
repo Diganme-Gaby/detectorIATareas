@@ -1,0 +1,62 @@
+.paginacion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 30px;
+  margin-top: 30px;
+}
+
+.paginas {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.paginas .fantasma {
+  padding: 6px 10px;
+  font-size: 16px;
+}
+
+.numero-pagina {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  background: none;
+  color: var(--color-ceniza);
+  font-family: var(--fuente);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.numero-pagina:hover {
+  color: var(--color-blanco);
+}
+
+.numero-pagina.actual {
+  border-color: var(--color-iris);
+  color: var(--color-blanco);
+}
+
+.tamano {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tamano select {
+  padding: 4px 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-linea-fuerte);
+  background: transparent;
+  color: var(--color-blanco);
+  font-family: var(--fuente);
+  font-size: 14px;
+}
+
+.tamano select option {
+  background: #0d0d0d;
+}
