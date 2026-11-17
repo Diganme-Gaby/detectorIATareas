@@ -1,0 +1,51 @@
+.pie {
+  max-width: var(--ancho-pagina);
+  margin: 0 auto;
+  padding: 60px 32px 36px;
+  border-top: 1px solid var(--color-linea);
+}
+
+.contenido {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 36px;
+}
+
+.bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 340px;
+}
+
+.marca {
+  margin-bottom: 4px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.titulo {
+  margin-bottom: 4px;
+  color: var(--color-azafran);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.derechos {
+  margin-top: 48px;
+  color: #5c5c5c;
+  font-size: 13px;
+}
+
+@media (max-width: 720px) {
+  .pie {
+    padding: 48px 20px 30px;
+  }
+
+  .contenido {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}

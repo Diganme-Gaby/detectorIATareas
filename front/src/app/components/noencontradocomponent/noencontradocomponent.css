@@ -1,0 +1,21 @@
+.error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 260px);
+}
+
+.titulo-display {
+  max-width: 900px;
+}
+
+.detalle {
+  max-width: 520px;
+  margin: 30px 0 36px;
+  font-size: 19px;
+}
+
+.ruta {
+  color: var(--color-azafran);
+  word-break: break-all;
+}

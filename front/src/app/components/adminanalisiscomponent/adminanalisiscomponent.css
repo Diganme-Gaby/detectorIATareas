@@ -1,0 +1,14 @@
+.titulo-fila {
+  display: block;
+  color: var(--color-blanco);
+  font-weight: 400;
+}
+
+.acciones {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.acciones .fantasma + .fantasma {
+  margin-left: 18px;
+}

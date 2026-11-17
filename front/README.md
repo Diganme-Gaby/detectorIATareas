@@ -1,59 +1,84 @@
-# Front
+# AI Content Detector - Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.5.
+**English** | [Español](README.es.md)
 
-## Development server
+This is the frontend of our final project for *Desarrollo de Sistemas de Información 3* at Universidad El Bosque. It is an Angular application where users upload files or a GitHub repository and see how likely it is that each file was generated with AI.
 
-To start a local development server, run:
+It only talks to our own backend (the Spring Boot API in the `back` folder). All calls to AI providers and other external APIs happen on the backend.
 
-```bash
-ng serve
-```
+## What you can do
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Create an account, confirm it by email, log in and recover your password.
+- Send files (including `.zip` archives) or a public GitHub repository for analysis.
+- Follow the progress of each analysis and see what every AI answered for each file, with its reasons.
+- Open or download the PDF reports and have them sent again by email.
+- Browse your history with filters and pagination.
+- Edit your name, phone number and password from your profile.
+- As an admin: manage users, see every analysis, check the audit log with a map link for each entry, and view usage statistics with charts. The user list, the audit log and the statistics can be exported to PDF.
 
-## Code scaffolding
+## Tech stack
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Angular 22 (NgModule based, with signals and the new `@if` / `@for` control flow)
+- ngx-toastr for notifications
+- Chart.js for the statistics charts
+- Vitest for the unit tests (`ng test`)
 
-```bash
-ng generate component component-name
-```
+## Getting started
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Requirements
 
-```bash
-ng generate --help
-```
+- Node.js 22 or newer
+- The backend running (by default on `http://localhost:8080`)
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+### Install and run
 
 ```bash
-ng test
+npm install
+npm start
 ```
 
-## Running end-to-end tests
+The app opens at [http://localhost:4200](http://localhost:4200).
 
-For end-to-end (e2e) testing, run:
+The backend URL is defined in a single place: `URL_BACK` in `src/app/services/authservice.ts`. Change it there when the backend is deployed.
+
+### Tests
 
 ```bash
-ng e2e
+npm test
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+There are 71 tests across components, services, guards, the interceptor and the utilities. They also run automatically on GitHub Actions for every pull request.
 
-## Additional Resources
+### Build
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```bash
+npm run build
+```
+
+The output goes to `dist/`. The `public/_redirects` file makes Angular routes work when the site is deployed on Netlify.
+
+## Pages
+
+| Route | Page | Access |
+|---|---|---|
+| `/` | Home | Everyone |
+| `/login`, `/registro` | Log in and sign up | Everyone |
+| `/verificar-correo`, `/recuperar-contrasena`, `/restablecer-contrasena` | Email confirmation and password recovery (linked from the emails) | Everyone |
+| `/analizar` | New analysis | Logged in |
+| `/historial`, `/analisis/:id` | History and analysis detail | Logged in |
+| `/perfil` | Profile | Logged in |
+| `/admin/usuarios`, `/admin/analisis`, `/admin/auditoria`, `/admin/estadisticas` | Admin module | `ADMIN` role |
+
+Any other route shows a 404 page.
+
+## Project structure
+
+```
+src/app
+├── components   One folder per component (xcomponent: .ts, .html, .css and .spec.ts)
+├── models       Interfaces and types that mirror the backend DTOs (x.model.ts)
+├── services     HTTP services, the two route guards and the JWT interceptor (xservice.ts)
+└── util         Shared helpers: notifications, value formatting and PDF handling
+```
+
+The JWT is stored in `localStorage` and added to every protected request by the interceptor. If the backend answers 401 or 403, the session is closed and the user goes back to the login page.
