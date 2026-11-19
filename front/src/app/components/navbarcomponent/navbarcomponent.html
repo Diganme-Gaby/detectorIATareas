@@ -1,0 +1,52 @@
+<header class="barra">
+  <a routerLink="/" class="marca" (click)="cerrarMenu()">
+    <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+      <defs>
+        <linearGradient id="degradado-logo" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#8052ff" />
+          <stop offset="1" stop-color="#15846e" />
+        </linearGradient>
+      </defs>
+      <path d="M16 3 L29 27 L3 27 Z" fill="url(#degradado-logo)" />
+      <path d="M16 13 L22 24 L10 24 Z" fill="#000000" />
+    </svg>
+    <span>Detector IA</span>
+  </a>
+
+  <button
+    type="button"
+    class="boton-menu"
+    aria-label="Abrir menú"
+    [attr.aria-expanded]="menuAbierto()"
+    (click)="alternarMenu()"
+  >
+    <span></span>
+    <span></span>
+  </button>
+
+  <nav class="menu" [class.abierto]="menuAbierto()">
+    @if (auth.estaAutenticado()) {
+      <a routerLink="/analizar" routerLinkActive="activo" (click)="cerrarMenu()">Analizar</a>
+      <a routerLink="/historial" routerLinkActive="activo" (click)="cerrarMenu()">Historial</a>
+      @if (auth.esAdmin()) {
+        <a routerLink="/admin/usuarios" routerLinkActive="activo" (click)="cerrarMenu()">Usuarios</a>
+        <a routerLink="/admin/analisis" routerLinkActive="activo" (click)="cerrarMenu()">Análisis</a>
+        <a routerLink="/admin/auditoria" routerLinkActive="activo" (click)="cerrarMenu()">Auditoría</a>
+        <a routerLink="/admin/estadisticas" routerLinkActive="activo" (click)="cerrarMenu()">
+          Estadísticas
+        </a>
+      }
+      <span class="separador"></span>
+      <a routerLink="/perfil" routerLinkActive="activo" class="usuario" (click)="cerrarMenu()">
+        {{ auth.usuario() }}
+        @if (auth.esAdmin()) {
+          <span class="rol">Admin</span>
+        }
+      </a>
+      <button type="button" class="fantasma" (click)="cerrarSesion()">Salir</button>
+    } @else {
+      <a routerLink="/login" routerLinkActive="activo" (click)="cerrarMenu()">Iniciar sesión</a>
+      <a routerLink="/registro" class="boton" (click)="cerrarMenu()">Crear cuenta</a>
+    }
+  </nav>
+</header>
