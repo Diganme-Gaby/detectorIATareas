@@ -1,0 +1,91 @@
+<main class="pagina">
+  <header class="encabezado-pagina">
+    <div>
+      <span class="etiqueta">Administración</span>
+      <h1 class="titulo-grande">Auditoría</h1>
+      <p class="texto-ceniza">
+        {{ registros().length }} registros. Cada acción queda guardada y no se puede modificar.
+      </p>
+    </div>
+    <div class="grupo-botones">
+      <button type="button" class="boton" (click)="verPdf()">Exportar a PDF</button>
+      <button type="button" class="fantasma" (click)="descargarPdf()">Descargar</button>
+    </div>
+  </header>
+
+  <form class="filtros" (ngSubmit)="buscar()">
+    <div class="campo">
+      <label for="username">Usuario</label>
+      <input id="username" name="username" [(ngModel)]="filtro.username" placeholder="Exacto" />
+    </div>
+    <div class="campo">
+      <label for="accion">Acción</label>
+      <select id="accion" name="accion" [(ngModel)]="filtro.accion">
+        <option value="">Todas</option>
+        @for (a of acciones; track a) {
+          <option [value]="a">{{ formato.legible(a) }}</option>
+        }
+      </select>
+    </div>
+    <div class="campo">
+      <label for="desde">Desde</label>
+      <input id="desde" name="desde" type="date" [(ngModel)]="filtro.desde" />
+    </div>
+    <div class="campo">
+      <label for="hasta">Hasta</label>
+      <input id="hasta" name="hasta" type="date" [(ngModel)]="filtro.hasta" />
+    </div>
+    <div class="grupo-botones">
+      <button type="submit" class="boton">Filtrar</button>
+      <button type="button" class="fantasma" (click)="limpiar()">Limpiar</button>
+    </div>
+  </form>
+
+  @if (cargando()) {
+    <p class="vacio">Cargando registros...</p>
+  } @else if (registros().length === 0) {
+    <p class="vacio">No hay registros con esos filtros.</p>
+  } @else {
+    <div class="tabla-contenedor">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Acción</th>
+            <th>Descripción</th>
+            <th>IP</th>
+            <th>Ubicación</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of paginados(); track r.id) {
+            <tr>
+              <td class="texto-plata sin-salto">{{ formato.fecha(r.fecha) }}</td>
+              <td>{{ r.username }}</td>
+              <td class="sin-salto">{{ formato.legible(r.accion) }}</td>
+              <td class="texto-plata descripcion">{{ r.descripcion }}</td>
+              <td class="texto-ceniza sin-salto">{{ r.ip }}</td>
+              <td class="sin-salto">
+                @if (r.mapaUrl !== null) {
+                  <a [href]="r.mapaUrl" target="_blank" rel="noopener">{{ ubicacion(r) }}</a>
+                  <span class="texto-ceniza texto-chico coordenadas">{{ coordenadas(r) }}</span>
+                } @else {
+                  <span class="texto-ceniza">{{ ubicacion(r) }}</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-paginacioncomponent
+      [total]="registros().length"
+      [pagina]="pagina()"
+      [porPagina]="porPagina()"
+      (paginaCambiada)="pagina.set($event)"
+      (porPaginaCambiado)="cambiarPorPagina($event)"
+    ></app-paginacioncomponent>
+  }
+</main>
