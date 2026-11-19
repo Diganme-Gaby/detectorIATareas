@@ -1,0 +1,48 @@
+@if (total() > 0) {
+  <nav class="paginacion" aria-label="Paginación">
+    <span class="texto-ceniza texto-chico">
+      Mostrando {{ desde() }}-{{ hasta() }} de {{ total() }}
+    </span>
+
+    <div class="paginas">
+      <button
+        type="button"
+        class="fantasma"
+        aria-label="Página anterior"
+        [disabled]="pagina() === 1"
+        (click)="ir(pagina() - 1)"
+      >
+        ←
+      </button>
+      @for (p of paginas(); track p) {
+        <button
+          type="button"
+          class="numero-pagina"
+          [class.actual]="p === pagina()"
+          [attr.aria-current]="p === pagina() ? 'page' : null"
+          (click)="ir(p)"
+        >
+          {{ p }}
+        </button>
+      }
+      <button
+        type="button"
+        class="fantasma"
+        aria-label="Página siguiente"
+        [disabled]="pagina() === totalPaginas()"
+        (click)="ir(pagina() + 1)"
+      >
+        →
+      </button>
+    </div>
+
+    <label class="tamano texto-ceniza texto-chico">
+      Filas por página
+      <select [value]="porPagina()" (change)="cambiarTamano($event)">
+        @for (opcion of opciones; track opcion) {
+          <option [value]="opcion">{{ opcion }}</option>
+        }
+      </select>
+    </label>
+  </nav>
+}
