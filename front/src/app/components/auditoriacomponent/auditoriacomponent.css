@@ -1,0 +1,12 @@
+.sin-salto {
+  white-space: nowrap;
+}
+
+.descripcion {
+  min-width: 260px;
+  font-size: 14px;
+}
+
+.coordenadas {
+  display: block;
+}

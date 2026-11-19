@@ -1,0 +1,36 @@
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 42px 30px;
+  margin-bottom: 96px;
+}
+
+.cifras span {
+  display: block;
+  margin-top: 10px;
+}
+
+.graficas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 72px 60px;
+}
+
+.oculto {
+  visibility: hidden;
+}
+
+.grafica {
+  margin: 0;
+}
+
+.lienzo {
+  position: relative;
+  height: 280px;
+}
+
+@media (max-width: 900px) {
+  .graficas {
+    grid-template-columns: 1fr;
+  }
+}

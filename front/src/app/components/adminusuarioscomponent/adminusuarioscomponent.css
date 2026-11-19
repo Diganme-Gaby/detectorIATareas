@@ -1,0 +1,47 @@
+.edicion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 60px;
+  margin-bottom: 72px;
+  padding-bottom: 60px;
+  border-bottom: 1px solid var(--color-linea);
+}
+
+.edicion-titulo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  word-break: break-all;
+}
+
+.buscar-id {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+}
+
+.nombre {
+  display: block;
+}
+
+.estados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.acciones {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.acciones .fantasma + .fantasma {
+  margin-left: 18px;
+}
+
+@media (max-width: 860px) {
+  .edicion {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}

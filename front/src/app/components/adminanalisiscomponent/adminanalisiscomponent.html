@@ -1,0 +1,113 @@
+<main class="pagina">
+  <header class="encabezado-pagina">
+    <div>
+      <span class="etiqueta">Administración</span>
+      <h1 class="titulo-grande">Todos los análisis</h1>
+      <p class="texto-ceniza">{{ analisis().length }} resultados</p>
+    </div>
+  </header>
+
+  <form class="filtros" (ngSubmit)="buscar()">
+    <div class="campo">
+      <label for="texto">Buscar</label>
+      <input id="texto" name="texto" [(ngModel)]="filtro.texto" placeholder="Título o archivo" />
+    </div>
+    <div class="campo">
+      <label for="desde">Desde</label>
+      <input id="desde" name="desde" type="date" [(ngModel)]="filtro.desde" />
+    </div>
+    <div class="campo">
+      <label for="hasta">Hasta</label>
+      <input id="hasta" name="hasta" type="date" [(ngModel)]="filtro.hasta" />
+    </div>
+    <div class="campo">
+      <label for="categoria">Tipo de archivo</label>
+      <select id="categoria" name="categoria" [(ngModel)]="filtro.categoria">
+        <option value="">Todos</option>
+        @for (c of categorias; track c) {
+          <option [value]="c">{{ formato.categoria(c) }}</option>
+        }
+      </select>
+    </div>
+    <div class="campo">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado" [(ngModel)]="filtro.estado">
+        <option value="">Todos</option>
+        @for (e of estados; track e) {
+          <option [value]="e">{{ formato.legible(e) }}</option>
+        }
+      </select>
+    </div>
+    <div class="campo">
+      <label for="nivel">Nivel de IA</label>
+      <select id="nivel" name="nivel" [(ngModel)]="filtro.nivel">
+        <option value="">Todos</option>
+        @for (n of niveles; track n) {
+          <option [value]="n">{{ formato.nivel(n) }}</option>
+        }
+      </select>
+    </div>
+    <div class="grupo-botones">
+      <button type="submit" class="boton">Filtrar</button>
+      <button type="button" class="fantasma" (click)="limpiar()">Limpiar</button>
+    </div>
+  </form>
+
+  @if (cargando()) {
+    <p class="vacio">Cargando análisis...</p>
+  } @else if (analisis().length === 0) {
+    <p class="vacio">
+      No hay análisis con esos filtros.
+    </p>
+  } @else {
+    <div class="tabla-contenedor">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Análisis</th>
+            <th>Usuario</th>
+            <th>Enviado</th>
+            <th class="numero">Archivos</th>
+            <th class="numero">Promedio IA</th>
+            <th>Nivel</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of paginados(); track a.id) {
+            <tr>
+              <td>
+                <a [routerLink]="['/analisis', a.id]" class="titulo-fila">{{ a.titulo }}</a>
+                <span class="texto-ceniza texto-chico">{{ formato.origen(a.origen) }}</span>
+              </td>
+              <td>{{ a.username }}</td>
+              <td class="texto-plata">{{ formato.fecha(a.fechaCreacion) }}</td>
+              <td class="numero">{{ a.totalArchivos }}</td>
+              <td class="numero">{{ formato.porcentaje(a.promedioIA) }}</td>
+              <td>
+                <span [class]="formato.claseNivel(a.nivel)">{{ formato.nivel(a.nivel) }}</span>
+              </td>
+              <td>
+                <span [class]="formato.claseEstado(a.estado)">{{ formato.legible(a.estado) }}</span>
+              </td>
+              <td class="acciones">
+                <a [routerLink]="['/analisis', a.id]" class="fantasma">Ver</a>
+                @if (!enProceso(a)) {
+                  <button type="button" class="fantasma" (click)="verPdf(a)">PDF</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-paginacioncomponent
+      [total]="analisis().length"
+      [pagina]="pagina()"
+      [porPagina]="porPagina()"
+      (paginaCambiada)="pagina.set($event)"
+      (porPaginaCambiado)="cambiarPorPagina($event)"
+    ></app-paginacioncomponent>
+  }
+</main>

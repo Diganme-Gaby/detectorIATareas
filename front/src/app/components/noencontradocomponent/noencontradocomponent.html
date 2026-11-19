@@ -1,0 +1,17 @@
+<main class="pagina error">
+  <span class="etiqueta">Error 404</span>
+  <h1 class="titulo-display">Esta página no existe.</h1>
+  <p class="texto-plata detalle">
+    No encontramos <span class="ruta">{{ ruta }}</span>. Puede que el enlace esté mal escrito o
+    que la página ya no exista.
+  </p>
+  <div class="grupo-botones">
+    @if (auth.estaAutenticado()) {
+      <a routerLink="/analizar" class="boton">Ir a analizar</a>
+      <a routerLink="/historial" class="fantasma">Ver mi historial</a>
+    } @else {
+      <a routerLink="/" class="boton">Ir al inicio</a>
+      <a routerLink="/login" class="fantasma">Iniciar sesión</a>
+    }
+  </div>
+</main>

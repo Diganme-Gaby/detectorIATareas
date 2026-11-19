@@ -1,0 +1,63 @@
+<main class="pagina">
+  <header class="encabezado-pagina">
+    <div>
+      <span class="etiqueta">Administración</span>
+      <h1 class="titulo-grande">Estadísticas</h1>
+    </div>
+    <div class="grupo-botones">
+      <button type="button" class="boton" [disabled]="stats() === null || generando()" (click)="verPdf()">
+        {{ generando() ? 'Generando...' : 'Reporte PDF' }}
+      </button>
+      <button
+        type="button"
+        class="fantasma"
+        [disabled]="stats() === null || generando()"
+        (click)="descargarPdf()"
+      >
+        Descargar
+      </button>
+    </div>
+  </header>
+
+  @if (stats(); as s) {
+    <section class="cifras">
+      <div>
+        <p class="cifra">{{ s.totalUsuarios }}</p>
+        <span class="texto-ceniza texto-chico">Usuarios registrados</span>
+      </div>
+      <div>
+        <p class="cifra">{{ s.usuariosActivos }}</p>
+        <span class="texto-ceniza texto-chico">Usuarios activos</span>
+      </div>
+      <div>
+        <p class="cifra">{{ s.usuariosVerificados }}</p>
+        <span class="texto-ceniza texto-chico">Correos confirmados</span>
+      </div>
+      <div>
+        <p class="cifra">{{ s.totalAnalisis }}</p>
+        <span class="texto-ceniza texto-chico">Análisis</span>
+      </div>
+      <div>
+        <p class="cifra">{{ s.totalArchivos }}</p>
+        <span class="texto-ceniza texto-chico">Archivos analizados</span>
+      </div>
+      <div>
+        <p class="cifra">{{ formato.porcentaje(s.promedioGeneralIA) }}</p>
+        <span class="texto-ceniza texto-chico">Promedio general de IA</span>
+      </div>
+    </section>
+  } @else {
+    <p class="vacio">Calculando estadísticas...</p>
+  }
+
+  <section class="graficas" [class.oculto]="stats() === null">
+    @for (g of graficas; track g.id) {
+      <figure class="grafica">
+        <figcaption class="etiqueta">{{ g.titulo }}</figcaption>
+        <div class="lienzo">
+          <canvas [id]="g.id"></canvas>
+        </div>
+      </figure>
+    }
+  </section>
+</main>

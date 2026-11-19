@@ -1,0 +1,28 @@
+.datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px 60px;
+}
+
+.datos p {
+  margin-top: 6px;
+  word-break: break-all;
+}
+
+.columnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 96px;
+  max-width: 1040px;
+}
+
+.formulario h2 {
+  margin-bottom: -12px;
+}
+
+@media (max-width: 860px) {
+  .columnas {
+    grid-template-columns: 1fr;
+    gap: 72px;
+  }
+}

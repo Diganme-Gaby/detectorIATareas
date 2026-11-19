@@ -1,0 +1,129 @@
+<main class="pagina">
+  <header class="encabezado-pagina">
+    <div>
+      <span class="etiqueta">Mi cuenta</span>
+      <h1 class="titulo-grande">{{ perfil()?.nombreCompleto ?? 'Perfil' }}</h1>
+    </div>
+  </header>
+
+  @if (perfil(); as p) {
+    <section class="datos">
+      <div>
+        <span class="texto-ceniza texto-chico">Usuario</span>
+        <p>{{ p.username }}</p>
+      </div>
+      <div>
+        <span class="texto-ceniza texto-chico">Correo</span>
+        <p>{{ p.email }}</p>
+      </div>
+      <div>
+        <span class="texto-ceniza texto-chico">Rol</span>
+        <p>{{ p.role === 'ADMIN' ? 'Administrador' : 'Usuario' }}</p>
+      </div>
+      <div>
+        <span class="texto-ceniza texto-chico">Miembro desde</span>
+        <p>{{ formato.fecha(p.fechaRegistro) }}</p>
+      </div>
+      <div>
+        <span class="texto-ceniza texto-chico">Último acceso</span>
+        <p>{{ formato.fecha(p.ultimoAcceso) }}</p>
+      </div>
+    </section>
+
+    <div class="columnas seccion">
+      <form class="formulario" #formPerfil="ngForm" (ngSubmit)="guardarPerfil()">
+        <h2 class="titulo-chico">Datos personales</h2>
+        <p class="ayuda">El usuario y el correo no se pueden cambiar.</p>
+        <div class="campo">
+          <label for="nombreCompleto">Nombre completo</label>
+          <input
+            id="nombreCompleto"
+            name="nombreCompleto"
+            [(ngModel)]="datos.nombreCompleto"
+            required
+            maxlength="100"
+          />
+        </div>
+        <div class="campo">
+          <label for="telefono">Teléfono</label>
+          <input
+            id="telefono"
+            name="telefono"
+            type="tel"
+            [(ngModel)]="datos.telefono"
+            pattern="[0-9+\- ]{7,20}"
+          />
+        </div>
+        <button type="submit" class="boton" [disabled]="formPerfil.invalid || guardando()">
+          {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </form>
+
+      <form
+        class="formulario"
+        #formClave="ngForm"
+        (ngSubmit)="cambiarContrasena(formClave)"
+      >
+        <h2 class="titulo-chico">Contraseña</h2>
+        <p class="ayuda">Mínimo 8 caracteres, con mayúscula, minúscula, número y un símbolo.</p>
+        <div class="campo">
+          <label for="passwordActual">Contraseña actual</label>
+          <div class="campo-clave">
+            <input
+              id="passwordActual"
+              name="passwordActual"
+              [type]="verActual() ? 'text' : 'password'"
+              [(ngModel)]="claves.passwordActual"
+              required
+              autocomplete="current-password"
+            />
+            <app-verclavecomponent [(visible)]="verActual" />
+          </div>
+        </div>
+        <div class="campo">
+          <label for="passwordNueva">Contraseña nueva</label>
+          <div class="campo-clave">
+            <input
+              id="passwordNueva"
+              name="passwordNueva"
+              [type]="verNueva() ? 'text' : 'password'"
+              [(ngModel)]="claves.passwordNueva"
+              required
+              autocomplete="new-password"
+            />
+            <app-verclavecomponent [(visible)]="verNueva" />
+          </div>
+          @if (claves.passwordNueva !== '' && !passwordValida()) {
+            <span class="ayuda-error">Todavía no cumple las reglas.</span>
+          }
+        </div>
+        <div class="campo">
+          <label for="confirmacion">Repite la contraseña nueva</label>
+          <div class="campo-clave">
+            <input
+              id="confirmacion"
+              name="confirmacion"
+              [type]="verConfirmacion() ? 'text' : 'password'"
+              [(ngModel)]="confirmacion"
+              required
+              autocomplete="new-password"
+            />
+            <app-verclavecomponent [(visible)]="verConfirmacion" />
+          </div>
+          @if (confirmacion !== '' && !coinciden()) {
+            <span class="ayuda-error">Las contraseñas no coinciden.</span>
+          }
+        </div>
+        <button
+          type="submit"
+          class="boton"
+          [disabled]="formClave.invalid || !passwordValida() || !coinciden() || cambiando()"
+        >
+          {{ cambiando() ? 'Cambiando...' : 'Cambiar contraseña' }}
+        </button>
+      </form>
+    </div>
+  } @else {
+    <p class="vacio">Cargando tu perfil...</p>
+  }
+</main>

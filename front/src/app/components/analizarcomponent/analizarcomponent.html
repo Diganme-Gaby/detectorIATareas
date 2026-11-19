@@ -1,0 +1,182 @@
+<main class="pagina">
+  <header class="encabezado-pagina">
+    <div>
+      <span class="etiqueta">Nuevo análisis</span>
+      <h1 class="titulo-grande">¿Qué quieres revisar?</h1>
+    </div>
+  </header>
+
+  <div class="pestanas">
+    <button
+      type="button"
+      class="pestana"
+      [class.pestana-activa]="modo() === 'ARCHIVOS'"
+      (click)="cambiarModo('ARCHIVOS')"
+    >
+      Archivos
+    </button>
+    <button
+      type="button"
+      class="pestana"
+      [class.pestana-activa]="modo() === 'GITHUB'"
+      (click)="cambiarModo('GITHUB')"
+    >
+      Repositorio de GitHub
+    </button>
+  </div>
+
+  @if (modo() === 'ARCHIVOS') {
+    <div class="columnas">
+      <div>
+        <label
+          class="zona"
+          [class.zona-activa]="arrastrando()"
+          (dragover)="alArrastrar($event)"
+          (dragleave)="alSalir()"
+          (drop)="alSoltar($event)"
+        >
+          <input type="file" multiple class="oculto" (change)="alSeleccionar($event)" />
+          <span class="zona-titulo">Arrastra tus archivos aquí</span>
+          <span class="texto-ceniza">o haz clic para buscarlos en tu equipo</span>
+        </label>
+
+        @if (archivos().length > 0) {
+          <ul class="lista">
+            @for (archivo of archivos(); track archivo.name; let i = $index) {
+              <li>
+                <div class="lista-nombre">
+                  <span>{{ archivo.name }}</span>
+                  <span class="texto-ceniza texto-chico">
+                    {{ formato.tamano(archivo.size) }}
+                    @if (esZip(archivo)) {
+                      · cada archivo del .zip se analiza por separado
+                    }
+                  </span>
+                </div>
+                <button type="button" class="fantasma fantasma-peligro" (click)="quitar(i)">
+                  Quitar
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <form class="formulario" #formArchivos="ngForm" (ngSubmit)="enviarArchivos()">
+        <div class="campo">
+          <label for="titulo">Título (opcional)</label>
+          <input
+            id="titulo"
+            name="titulo"
+            [(ngModel)]="titulo"
+            maxlength="150"
+            placeholder="Por ejemplo: Ensayo final de ética"
+          />
+        </div>
+
+        <ul class="reglas texto-ceniza texto-chico">
+          <li>Hasta {{ maxArchivos() }} archivos por envío y 20 MB por archivo.</li>
+          <li>Texto, código, PDF, Word, Excel, PowerPoint, imágenes, audio, video o .zip.</li>
+          @if (limites(); as l) {
+            <li>De un .zip se toman hasta {{ l.maxArchivosDesdeZip }} archivos.</li>
+          }
+        </ul>
+
+        <button
+          type="submit"
+          class="boton"
+          [disabled]="archivos().length === 0 || enviando()"
+        >
+          @if (enviando()) {
+            Enviando...
+          } @else if (archivos().length === 0) {
+            Elige al menos un archivo
+          } @else {
+            Analizar {{ archivos().length }} {{ archivos().length === 1 ? 'archivo' : 'archivos' }}
+          }
+        </button>
+      </form>
+    </div>
+  } @else {
+    <div class="columnas">
+      <form class="formulario" #formRepo="ngForm" (ngSubmit)="enviarRepositorio()">
+        <div class="campo">
+          <label for="url">Enlace del repositorio</label>
+          <input
+            id="url"
+            name="url"
+            type="url"
+            [(ngModel)]="repositorio.url"
+            required
+            pattern="https://(www\.)?github\.com/.+"
+            placeholder="https://github.com/usuario/proyecto"
+          />
+          <span class="ayuda">Debe ser un repositorio público de github.com.</span>
+        </div>
+
+        <div class="fila-campos">
+          <div class="campo">
+            <label for="rama">Rama (opcional)</label>
+            <input id="rama" name="rama" [(ngModel)]="repositorio.rama" placeholder="main" />
+          </div>
+          <div class="campo">
+            <label for="carpeta">Carpeta (opcional)</label>
+            <input
+              id="carpeta"
+              name="carpeta"
+              [(ngModel)]="repositorio.carpeta"
+              placeholder="src/main/java"
+            />
+          </div>
+        </div>
+
+        <div class="fila-campos">
+          <div class="campo">
+            <label for="extensiones">Extensiones (opcional)</label>
+            <input
+              id="extensiones"
+              name="extensiones"
+              [(ngModel)]="extensionesTexto"
+              placeholder="java, ts, html"
+            />
+          </div>
+          <div class="campo">
+            <label for="maxArchivos">Máximo de archivos</label>
+            <input
+              id="maxArchivos"
+              name="maxArchivos"
+              type="number"
+              min="1"
+              [max]="limites()?.maxArchivosRepositorio ?? 15"
+              [(ngModel)]="repositorio.maxArchivos"
+              [placeholder]="limites()?.maxArchivosRepositorio ?? 15"
+            />
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="tituloRepo">Título (opcional)</label>
+          <input id="tituloRepo" name="tituloRepo" [(ngModel)]="repositorio.titulo" maxlength="150" />
+        </div>
+
+        <button type="submit" class="boton" [disabled]="formRepo.invalid || enviando()">
+          {{ enviando() ? 'Descargando repositorio...' : 'Analizar repositorio' }}
+        </button>
+      </form>
+
+      <div class="explicacion">
+        <p class="texto-plata">
+          Descargamos el repositorio y analizamos cada archivo por separado, cada uno con su propio
+          reporte.
+        </p>
+        @if (limites(); as l) {
+          <p class="texto-ceniza texto-chico">
+            Si no indicas extensiones se toman los archivos
+            {{ l.extensionesRepositorioPorDefecto.join(', ') }}, hasta
+            {{ l.maxArchivosRepositorio }} archivos.
+          </p>
+        }
+      </div>
+    </div>
+  }
+</main>

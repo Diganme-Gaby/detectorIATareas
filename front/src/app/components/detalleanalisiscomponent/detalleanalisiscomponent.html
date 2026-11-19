@@ -1,0 +1,157 @@
+<main class="pagina">
+  @if (noEncontrado()) {
+    <span class="etiqueta">Análisis</span>
+    <h1 class="titulo-grande">No encontramos este análisis.</h1>
+    <p class="vacio">Puede que no exista o que pertenezca a otra cuenta.</p>
+    <a routerLink="/historial" class="boton">Ir al historial</a>
+  } @else if (analisis(); as a) {
+    <header class="encabezado-pagina">
+      <div class="titulo-bloque">
+        <a [routerLink]="auth.esAdmin() ? '/admin/analisis' : '/historial'" class="fantasma">
+          ← Volver
+        </a>
+        <span class="etiqueta">{{ formato.origen(a.origen) }} · {{ formato.fecha(a.fechaCreacion) }}</span>
+        <h1 class="titulo-medio">{{ a.titulo }}</h1>
+        @if (a.urlRepositorio !== null) {
+          <a [href]="a.urlRepositorio" target="_blank" rel="noopener" class="texto-chico">
+            {{ a.urlRepositorio }}
+          </a>
+        }
+      </div>
+      @if (!enProceso()) {
+        <div class="grupo-botones">
+          <button type="button" class="boton" (click)="verPdf(null)">Ver reporte</button>
+          <button type="button" class="fantasma" (click)="descargarPdf(null, nombrePdf(null))">
+            Descargar PDF
+          </button>
+          <button
+            type="button"
+            class="fantasma"
+            [disabled]="reenviando()"
+            (click)="reenviarCorreo()"
+          >
+            {{ reenviando() ? 'Enviando...' : 'Reenviar al correo' }}
+          </button>
+        </div>
+      }
+    </header>
+
+    <section class="resumen">
+      <div>
+        <span class="texto-ceniza texto-chico">Promedio de IA</span>
+        <p class="cifra">{{ formato.porcentaje(a.promedioIA) }}</p>
+      </div>
+      <div>
+        <span class="texto-ceniza texto-chico">Nivel</span>
+        <p><span [class]="formato.claseNivel(a.nivel)">{{ formato.nivel(a.nivel) }}</span></p>
+      </div>
+      <div>
+        <span class="texto-ceniza texto-chico">Estado</span>
+        <p><span [class]="formato.claseEstado(a.estado)">{{ formato.legible(a.estado) }}</span></p>
+      </div>
+      <div>
+        <span class="texto-ceniza texto-chico">Archivos</span>
+        <p>{{ a.archivos.length }} de {{ a.totalArchivos }}</p>
+      </div>
+      @if (auth.esAdmin()) {
+        <div>
+          <span class="texto-ceniza texto-chico">Usuario</span>
+          <p>{{ a.username }}</p>
+        </div>
+      }
+    </section>
+
+    @if (enProceso()) {
+      <div class="progreso">
+        <div class="barra-progreso"><span [style.width.%]="progreso()"></span></div>
+        <p class="texto-plata texto-chico">
+          Los modelos están revisando los archivos. Esta página se actualiza sola; también te
+          llegará un correo cuando termine.
+        </p>
+      </div>
+    }
+
+    @if (a.mensaje !== null) {
+      <p class="aviso mensaje">{{ a.mensaje }}</p>
+    }
+
+    <section class="seccion">
+      <h2 class="titulo-chico encabezado-seccion">Archivos</h2>
+      @for (archivo of archivosPaginados(a); track archivo.id) {
+        <article class="archivo">
+          <button type="button" class="archivo-cabecera" (click)="alternar(archivo)">
+            <span class="archivo-nombre">
+              <span>{{ archivo.ruta }}</span>
+              <span class="texto-ceniza texto-chico">
+                {{ formato.categoria(archivo.categoria) }} · {{ formato.tamano(archivo.tamanoBytes) }}
+              </span>
+            </span>
+            <span class="archivo-datos">
+              <span class="numero">{{ formato.porcentaje(archivo.promedioIA) }}</span>
+              <span [class]="formato.claseNivel(archivo.nivel)">{{ formato.nivel(archivo.nivel) }}</span>
+              <span class="flecha" [class.girada]="abierto() === archivo.id">↓</span>
+            </span>
+          </button>
+
+          @if (abierto() === archivo.id) {
+            <div class="archivo-detalle">
+              @for (aviso of archivo.avisos; track aviso) {
+                <p class="aviso">{{ aviso }}</p>
+              }
+
+              <div class="modelos">
+                @for (r of archivo.resultados; track r.id) {
+                  <div class="modelo">
+                    <span class="etiqueta">{{ r.posicion }}</span>
+                    @if (r.exitoso) {
+                      <p class="cifra">{{ formato.porcentaje(r.porcentajeIA) }}</p>
+                      <p class="texto-plata">{{ formato.veredicto(r.veredicto) }}</p>
+                      <p class="texto-ceniza texto-chico">
+                        {{ quienRespondio(r) }} · {{ r.modelo }}
+                      </p>
+                      <ol class="motivos">
+                        @for (motivo of r.motivos; track $index) {
+                          <li>{{ motivo }}</li>
+                        }
+                      </ol>
+                    } @else {
+                      <p class="texto-ceniza">{{ r.mensajeUsuario }}</p>
+                    }
+                  </div>
+                }
+              </div>
+
+              @if (a.archivos.length > 1 && !enProceso()) {
+                <div class="grupo-botones">
+                  <button type="button" class="fantasma" (click)="verPdf(archivo.id)">
+                    Ver reporte de este archivo
+                  </button>
+                  <button
+                    type="button"
+                    class="fantasma"
+                    (click)="descargarPdf(archivo.id, nombrePdf(archivo))"
+                  >
+                    Descargar
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </article>
+      } @empty {
+        <p class="vacio">Todavía no hay archivos procesados.</p>
+      }
+      @if (a.archivos.length > 10) {
+        <app-paginacioncomponent
+          [total]="a.archivos.length"
+          [pagina]="pagina()"
+          [porPagina]="porPagina()"
+          (paginaCambiada)="pagina.set($event)"
+          (porPaginaCambiado)="cambiarPorPagina($event)"
+        ></app-paginacioncomponent>
+      }
+    </section>
+  } @else {
+    <p class="vacio">Cargando el análisis...</p>
+  }
+</main>

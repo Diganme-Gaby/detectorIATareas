@@ -1,0 +1,136 @@
+.titulo-bloque {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 760px;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.titulo-bloque .etiqueta {
+  margin: 18px 0 0;
+}
+
+.resumen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px 60px;
+  align-items: flex-end;
+}
+
+.resumen p {
+  margin-top: 8px;
+}
+
+.progreso {
+  margin-top: 48px;
+}
+
+.barra-progreso {
+  height: 2px;
+  margin-bottom: 14px;
+  background: var(--color-linea-fuerte);
+}
+
+.barra-progreso span {
+  display: block;
+  height: 100%;
+  background: var(--color-iris);
+  transition: width 0.6s ease;
+}
+
+.mensaje {
+  margin-top: 36px;
+}
+
+.encabezado-seccion {
+  margin-bottom: 18px;
+}
+
+.archivo {
+  border-bottom: 1px solid var(--color-linea);
+}
+
+.archivo-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: 22px 0;
+  border: 0;
+  background: none;
+  color: var(--color-blanco);
+  font-family: var(--fuente);
+  font-size: 16px;
+  font-weight: 300;
+  text-align: left;
+  cursor: pointer;
+}
+
+.archivo-nombre {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  word-break: break-all;
+}
+
+.archivo-datos {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.flecha {
+  color: var(--color-ceniza);
+  transition: transform 0.2s ease;
+}
+
+.girada {
+  transform: rotate(180deg);
+}
+
+.archivo-detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 6px 0 36px;
+}
+
+.modelos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 42px;
+}
+
+.modelo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modelo .etiqueta {
+  margin: 0;
+}
+
+.motivos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--color-plata);
+  font-size: 15px;
+}
+
+@media (max-width: 900px) {
+  .modelos {
+    grid-template-columns: 1fr;
+  }
+
+  .archivo-datos {
+    gap: 12px;
+  }
+}
