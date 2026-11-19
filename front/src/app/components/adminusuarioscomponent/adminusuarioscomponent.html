@@ -1,0 +1,151 @@
+<main class="pagina">
+  <header class="encabezado-pagina">
+    <div>
+      <span class="etiqueta">Administración</span>
+      <h1 class="titulo-grande">Usuarios</h1>
+      <p class="texto-ceniza">{{ total() }} cuentas registradas</p>
+    </div>
+    <div class="grupo-botones">
+      <button type="button" class="boton" (click)="verPdf()">Ver reporte PDF</button>
+      <button type="button" class="fantasma" (click)="descargarPdf()">Descargar</button>
+    </div>
+  </header>
+
+  @if (editando(); as u) {
+    <section class="edicion">
+      <div class="edicion-titulo">
+        <span class="etiqueta">Editando · ID {{ u.id }}</span>
+        <h2 class="titulo-medio">{{ u.username }}</h2>
+        <p class="texto-ceniza">{{ u.email }}</p>
+        <p class="ayuda">El usuario y el correo no se pueden cambiar.</p>
+      </div>
+      <form class="formulario" #formEditar="ngForm" (ngSubmit)="guardar()">
+        <div class="campo">
+          <label for="nombreCompleto">Nombre completo</label>
+          <input
+            id="nombreCompleto"
+            name="nombreCompleto"
+            [(ngModel)]="datos.nombreCompleto"
+            required
+            maxlength="100"
+          />
+        </div>
+        <div class="campo">
+          <label for="telefono">Teléfono</label>
+          <input
+            id="telefono"
+            name="telefono"
+            type="tel"
+            [(ngModel)]="datos.telefono"
+            pattern="[0-9+\- ]{7,20}"
+          />
+        </div>
+        <div class="campo">
+          <label for="role">Rol</label>
+          <select id="role" name="role" [(ngModel)]="datos.role" required>
+            <option value="USER">Usuario</option>
+            <option value="ADMIN">Administrador</option>
+          </select>
+        </div>
+        <div class="grupo-botones">
+          <button type="submit" class="boton" [disabled]="formEditar.invalid || guardando()">
+            {{ guardando() ? 'Guardando...' : 'Guardar' }}
+          </button>
+          <button type="button" class="fantasma" (click)="cerrarEdicion()">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <div class="filtros">
+    <div class="campo">
+      <label for="busqueda">Buscar</label>
+      <input
+        id="busqueda"
+        name="busqueda"
+        [(ngModel)]="busqueda"
+        (ngModelChange)="pagina.set(1)"
+        placeholder="Usuario, nombre o correo"
+      />
+    </div>
+    <form class="buscar-id" #formId="ngForm" (ngSubmit)="buscarPorId()">
+      <div class="campo">
+        <label for="idBuscar">Buscar por ID</label>
+        <input id="idBuscar" name="idBuscar" type="number" min="1" [(ngModel)]="idBuscar" required />
+      </div>
+      <button type="submit" class="fantasma" [disabled]="formId.invalid">Abrir</button>
+    </form>
+  </div>
+
+  @if (cargando()) {
+    <p class="vacio">Cargando usuarios...</p>
+  } @else if (filtrados().length === 0) {
+    <p class="vacio">No hay usuarios que coincidan.</p>
+  } @else {
+    <div class="tabla-contenedor">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th class="numero">ID</th>
+            <th>Usuario</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Último acceso</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of paginados(); track u.id) {
+            <tr>
+              <td class="numero texto-ceniza">{{ u.id }}</td>
+              <td>
+                <span class="nombre">{{ u.username }}</span>
+                <span class="texto-ceniza texto-chico">{{ u.nombreCompleto }}</span>
+              </td>
+              <td class="texto-plata">{{ u.email }}</td>
+              <td>{{ u.role === 'ADMIN' ? 'Admin' : 'Usuario' }}</td>
+              <td>
+                <div class="estados">
+                  <span [class]="u.activo ? 'chip estado-ok' : 'chip estado-error'">
+                    {{ u.activo ? 'Activa' : 'Inactiva' }}
+                  </span>
+                  @if (!u.correoVerificado) {
+                    <span class="chip nivel-ninguno">Sin confirmar</span>
+                  }
+                  @if (u.bloqueado) {
+                    <span class="chip estado-parcial">Bloqueada</span>
+                  }
+                </div>
+              </td>
+              <td class="texto-plata">{{ formato.fecha(u.ultimoAcceso) }}</td>
+              <td class="acciones">
+                <button type="button" class="fantasma" (click)="abrirEdicion(u)">Editar</button>
+                @if (u.bloqueado) {
+                  <button type="button" class="fantasma" (click)="desbloquear(u)">Desbloquear</button>
+                }
+                @if (u.username !== auth.usuario()) {
+                  <button
+                    type="button"
+                    class="fantasma"
+                    [class.fantasma-peligro]="u.activo"
+                    (click)="cambiarEstado(u)"
+                  >
+                    {{ u.activo ? 'Desactivar' : 'Activar' }}
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-paginacioncomponent
+      [total]="filtrados().length"
+      [pagina]="pagina()"
+      [porPagina]="porPagina()"
+      (paginaCambiada)="pagina.set($event)"
+      (porPaginaCambiado)="cambiarPorPagina($event)"
+    ></app-paginacioncomponent>
+  }
+</main>
