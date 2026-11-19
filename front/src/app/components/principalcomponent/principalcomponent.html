@@ -1,0 +1,60 @@
+<section class="portada">
+  <div class="portada-texto">
+    <span class="etiqueta">Universidad El Bosque</span>
+    <h1 class="titulo-display">¿Lo hizo una persona o una IA?</h1>
+    <p class="introduccion texto-plata">
+      Sube un archivo o el enlace de un repositorio y tres modelos de inteligencia artificial te
+      dirán, cada uno con sus razones, qué tan probable es que haya sido generado con IA.
+    </p>
+    <div class="grupo-botones">
+      @if (auth.estaAutenticado()) {
+        <a routerLink="/analizar" class="boton">Analizar archivos</a>
+        <a routerLink="/historial" class="fantasma">Ver mi historial</a>
+      } @else {
+        <a routerLink="/registro" class="boton">Crear cuenta</a>
+        <a routerLink="/login" class="fantasma">Ya tengo cuenta</a>
+      }
+    </div>
+  </div>
+
+  <canvas #lienzo class="constelacion" aria-hidden="true"></canvas>
+</section>
+
+<section class="bloque">
+  <div class="bloque-titulo">
+    <span class="etiqueta">Cómo funciona</span>
+    <h2 class="titulo-grande">Tres opiniones en lugar de una.</h2>
+  </div>
+  <ol class="pasos">
+    @for (paso of pasos; track paso.numero) {
+      <li>
+        <span class="numero">{{ paso.numero }}</span>
+        <div>
+          <h3 class="titulo-chico">{{ paso.titulo }}</h3>
+          <p class="texto-plata">{{ paso.texto }}</p>
+        </div>
+      </li>
+    }
+  </ol>
+</section>
+
+<section class="bloque bloque-invertido">
+  <div class="bloque-titulo">
+    <span class="etiqueta">Lo que recibes</span>
+    <h2 class="titulo-grande">Un reporte que puedes explicar.</h2>
+  </div>
+  <div class="detalles">
+    <p class="texto-plata">
+      No es solo un número. Cada modelo explica qué vio en el archivo: estructura demasiado
+      uniforme, frases de relleno, comentarios genéricos en el código o detalles que delatan una
+      imagen generada.
+    </p>
+    <p class="texto-plata">
+      Los reportes se pueden ver en el navegador, descargar en PDF y quedan en tu historial para
+      siempre. Si subes un .zip o un repositorio, cada archivo tiene su propio reporte.
+    </p>
+    <p class="texto-ceniza texto-chico">
+      Los porcentajes son estimaciones. Úsalos como una señal más, junto a tu propio criterio.
+    </p>
+  </div>
+</section>
