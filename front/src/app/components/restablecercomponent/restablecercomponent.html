@@ -1,0 +1,61 @@
+<main class="pagina pagina-angosta">
+  <span class="etiqueta">Recuperar acceso</span>
+  <h1 class="titulo-grande">Nueva contraseña</h1>
+
+  @if (token === '') {
+    <p class="aviso texto-estado">
+      Este enlace no es válido. Abre el enlace completo que llegó a tu correo o pide uno nuevo.
+    </p>
+    <a routerLink="/recuperar-contrasena" class="boton">Pedir un enlace nuevo</a>
+  } @else {
+    <form class="formulario" #formulario="ngForm" (ngSubmit)="guardar()">
+      <div class="campo">
+        <label for="passwordNueva">Contraseña nueva</label>
+        <div class="campo-clave">
+          <input
+            id="passwordNueva"
+            name="passwordNueva"
+            [type]="verNueva() ? 'text' : 'password'"
+            [(ngModel)]="passwordNueva"
+            required
+            autocomplete="new-password"
+          />
+          <app-verclavecomponent [(visible)]="verNueva" />
+        </div>
+        @if (passwordNueva !== '' && !passwordValida()) {
+          <span class="ayuda-error">
+            Mínimo 8 caracteres, con mayúscula, minúscula, número y un símbolo.
+          </span>
+        } @else {
+          <span class="ayuda">Mínimo 8 caracteres, con mayúscula, minúscula, número y un símbolo.</span>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="confirmacion">Repite la contraseña</label>
+        <div class="campo-clave">
+          <input
+            id="confirmacion"
+            name="confirmacion"
+            [type]="verConfirmacion() ? 'text' : 'password'"
+            [(ngModel)]="confirmacion"
+            required
+            autocomplete="new-password"
+          />
+          <app-verclavecomponent [(visible)]="verConfirmacion" />
+        </div>
+        @if (confirmacion !== '' && !coinciden()) {
+          <span class="ayuda-error">Las contraseñas no coinciden.</span>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="boton"
+        [disabled]="formulario.invalid || !passwordValida() || !coinciden() || guardando()"
+      >
+        {{ guardando() ? 'Guardando...' : 'Guardar contraseña' }}
+      </button>
+    </form>
+  }
+</main>
